@@ -4,21 +4,33 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
-	"github.com/AlexxIT/go2rtc/pkg/tcp/websocket"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/AlexxIT/go2rtc/pkg/tcp/websocket"
+
 	"github.com/AlexxIT/go2rtc/pkg/core"
 	"github.com/AlexxIT/go2rtc/pkg/tcp"
 )
 
 var Timeout = time.Second * 5
+var PlayHeader = map[string][]string{}
 
 func NewClient(uri string) *Conn {
-	return &Conn{uri: uri}
+	rtspWithParams, _ := url.Parse(uri)
+	if rtspWithParams.Query().Get("__RangeHeader") != "" {
+		PlayHeader["Range"] = []string{rtspWithParams.Query().Get("__RangeHeader")}
+	}
+	q := rtspWithParams.Query()
+	q.Del("__RangeHeader")
+	rtspWithParams.RawQuery = q.Encode()
+	rtspUrlCleaned := rtspWithParams.String()
+	fmt.Println("rtspUrlCleaned", rtspUrlCleaned)
+
+	return &Conn{uri: rtspUrlCleaned}
 }
 
 func (c *Conn) Dial() (err error) {
@@ -266,7 +278,11 @@ func (c *Conn) SetupMedia(media *core.Media) (byte, error) {
 }
 
 func (c *Conn) Play() (err error) {
-	req := &tcp.Request{Method: MethodPlay, URL: c.URL}
+	fmt.Println(PlayHeader)
+
+	req := &tcp.Request{Method: MethodPlay,
+		Header: PlayHeader,
+		URL:    c.URL}
 	return c.WriteRequest(req)
 }
 
