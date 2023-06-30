@@ -1,6 +1,13 @@
 package ws
 
 import (
+<<<<<<< HEAD
+=======
+	"github.com/AlexxIT/go2rtc/internal/api"
+	"github.com/AlexxIT/go2rtc/internal/app"
+	"github.com/gorilla/websocket"
+	"github.com/rs/zerolog/log"
+>>>>>>> 76ff
 	"net/http"
 	"net/url"
 	"strings"
@@ -19,7 +26,13 @@ func Init() {
 			Origin string `yaml:"origin"`
 		} `yaml:"api"`
 	}
+<<<<<<< HEAD
 	app.LoadConfig(&cfg)
+=======
+
+	app.LoadConfig(&cfg)
+
+>>>>>>> 76ff
 	initWS(cfg.Mod.Origin)
 
 	api.HandleFunc("api/ws", apiWS)
