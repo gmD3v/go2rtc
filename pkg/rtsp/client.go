@@ -28,6 +28,7 @@ func NewClient(uri string) *Conn {
 	q.Del("__RangeHeader")
 	rtspWithParams.RawQuery = q.Encode()
 	rtspUrlCleaned := rtspWithParams.String()
+	fmt.Println(rtspWithParams.User.Password())
 	fmt.Println("rtspUrlCleaned", rtspUrlCleaned)
 
 	return &Conn{uri: rtspUrlCleaned}
@@ -67,6 +68,7 @@ func (c *Conn) Do(req *tcp.Request) (*tcp.Response, error) {
 
 	res, err := c.ReadResponse()
 	if err != nil {
+		fmt.Println("ReadResponse", err)
 		return nil, err
 	}
 
@@ -136,6 +138,7 @@ func (c *Conn) Describe() error {
 
 	res, err := c.Do(req)
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 
